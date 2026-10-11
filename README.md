@@ -100,6 +100,44 @@ MAIL_FROM_ADDRESS=
 từ chối tất cả.** Cố ý: thiếu xác thực mà vẫn nhận thì bất kỳ ai biết địa chỉ
 webhook đều tự cấp license cho mình.
 
+## Dùng MySQL thay vì SQLite
+
+Mặc định là SQLite — một file, không máy chủ CSDL, không user/password, không
+phải sao lưu riêng. Với lượng đơn của sản phẩm này nó thừa sức.
+
+Muốn dùng MySQL (để xem bằng phpMyAdmin, hoặc để aaPanel sao lưu tự động) thì
+**không phải sửa dòng code nào** — đổi `.env` rồi chạy migration:
+
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=sql_license
+DB_USERNAME=
+DB_PASSWORD=
+```
+
+```bash
+php artisan migrate --force
+```
+
+Toàn bộ 140 bài kiểm tra đã chạy qua trên MySQL 8.0.46.
+
+⚠️ **Đừng import file `.sql` xuất từ SQLite vào MySQL.** Hai hệ dùng kiểu cột
+khác nhau (`PRAGMA` là lệnh riêng của SQLite, và `varchar` không độ dài thì
+MySQL từ chối) — phpMyAdmin sẽ báo lỗi `#1064` ngay dòng đầu.
+
+Đã có dữ liệu trong SQLite và muốn mang sang: để `migrate` dựng bảng trước,
+rồi chép **dữ liệu** bằng lệnh riêng. Dịch câu lệnh tạo bảng từ hệ này sang hệ
+kia là cách sớm muộn cũng sai.
+
+```bash
+echo "mat-khau-mysql" | php chuyen-sang-mysql.php 127.0.0.1 sql_license root
+```
+
+Lệnh đó tự đếm lại sau khi chép — chép xong mà không đối chiếu thì một bảng
+lặng lẽ không vào được cũng không ai biết.
+
 ## Lệnh chạy theo lịch
 
 Máy chủ phải có **một** dòng cron, nếu không thì không lịch nào chạy:
