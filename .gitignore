@@ -32,3 +32,6 @@ Thumbs.db
 /database/*.sqlite-journal
 /database/*.sqlite-shm
 /database/*.sqlite-wal
+
+# Ban xuat CSDL: co email khach va ma kich hoat.
+*.sql
