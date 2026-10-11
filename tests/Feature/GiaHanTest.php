@@ -24,7 +24,7 @@ class GiaHanTest extends TestCase
     {
         Mail::fake();
 
-        $don = app(OrderService::class)->taoDon('nopause', 'year', $email);
+        $don = app(OrderService::class)->taoDon('nopause', static::GOI, $email);
         $license = app(OrderService::class)->ghiNhanThanhToan($don);
 
         if ($conLai !== null) {
@@ -38,7 +38,7 @@ class GiaHanTest extends TestCase
 
     private function donGiaHan(License $cu, ?string $email = null): Order
     {
-        return app(OrderService::class)->taoDon('nopause', 'year', $email, $cu);
+        return app(OrderService::class)->taoDon('nopause', static::GOI, $email, $cu);
     }
 
     // --- Cong don han ---------------------------------------------------------
@@ -53,7 +53,7 @@ class GiaHanTest extends TestCase
         $this->assertSame($cu->key, $moi->key, 'Gia han lai sinh ma moi');
         $this->assertSame(1, License::count(), 'Co them mot license thua');
         $this->assertSame(
-            $hanCu->addDays(365)->toDateString(),
+            $hanCu->addDays($this->soNgay())->toDateString(),
             $moi->expires_at->toDateString(),
         );
     }
@@ -70,7 +70,7 @@ class GiaHanTest extends TestCase
 
         $moi = app(OrderService::class)->ghiNhanThanhToan($this->donGiaHan($cu));
 
-        $this->assertSame(465, (int) round(now()->diffInDays($moi->expires_at)));
+        $this->assertSame(100 + $this->soNgay(), (int) round(now()->diffInDays($moi->expires_at)));
     }
 
     /** Het han roi van gia han duoc - do moi la luc nguoi ta can nhat. */
@@ -80,7 +80,7 @@ class GiaHanTest extends TestCase
 
         $moi = app(OrderService::class)->ghiNhanThanhToan($this->donGiaHan($cu));
 
-        $this->assertSame(365, (int) round(now()->diffInDays($moi->expires_at)));
+        $this->assertSame($this->soNgay(), (int) round(now()->diffInDays($moi->expires_at)));
     }
 
     /**
@@ -134,7 +134,7 @@ class GiaHanTest extends TestCase
         $cu = $this->licenseCu(30);
 
         $ra = $this->postJson(route('order.create'), [
-            'product' => 'nopause', 'plan' => 'year', 'renew_key' => $cu->key,
+            'product' => 'nopause', 'plan' => static::GOI, 'renew_key' => $cu->key,
         ])->assertOk()->assertJsonPath('gia_han', true);
 
         $this->assertSame($cu->id, Order::where('code', $ra->json('code'))->first()->renew_license_id);
@@ -145,7 +145,7 @@ class GiaHanTest extends TestCase
         $cu = $this->licenseCu(30);
 
         $this->postJson(route('order.create'), [
-            'product' => 'nopause', 'plan' => 'year', 'renew_key' => strtolower($cu->key),
+            'product' => 'nopause', 'plan' => static::GOI, 'renew_key' => strtolower($cu->key),
         ])->assertOk()->assertJsonPath('gia_han', true);
     }
 
@@ -158,7 +158,7 @@ class GiaHanTest extends TestCase
     public function test_ma_cu_sai_thi_bao_loi_chu_khong_tao_don_mua_moi(): void
     {
         $this->postJson(route('order.create'), [
-            'product' => 'nopause', 'plan' => 'year', 'renew_key' => 'NOPAUSE-XXXX-YYYY-ZZZZ',
+            'product' => 'nopause', 'plan' => static::GOI, 'renew_key' => 'NOPAUSE-XXXX-YYYY-ZZZZ',
         ])->assertStatus(422);
 
         $this->assertSame(0, Order::count());
@@ -170,7 +170,7 @@ class GiaHanTest extends TestCase
         $cu->forceFill(['revoked_at' => now()])->save();
 
         $this->postJson(route('order.create'), [
-            'product' => 'nopause', 'plan' => 'year', 'renew_key' => $cu->key,
+            'product' => 'nopause', 'plan' => static::GOI, 'renew_key' => $cu->key,
         ])->assertStatus(422);
     }
 
@@ -179,9 +179,9 @@ class GiaHanTest extends TestCase
     {
         $cu = $this->licenseCu(30);
 
-        $mua = $this->postJson(route('order.create'), ['product' => 'nopause', 'plan' => 'year'])->json('code');
+        $mua = $this->postJson(route('order.create'), ['product' => 'nopause', 'plan' => static::GOI])->json('code');
         $gia = $this->postJson(route('order.create'), [
-            'product' => 'nopause', 'plan' => 'year', 'renew_key' => $cu->key,
+            'product' => 'nopause', 'plan' => static::GOI, 'renew_key' => $cu->key,
         ])->json('code');
 
         $this->assertNotSame($mua, $gia);

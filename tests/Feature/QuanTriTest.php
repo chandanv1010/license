@@ -40,7 +40,7 @@ class QuanTriTest extends TestCase
     {
         Mail::fake();
 
-        $don = app(OrderService::class)->taoDon('nopause', 'year', 'khach@example.test');
+        $don = app(OrderService::class)->taoDon('nopause', static::GOI, 'khach@example.test');
         $license = app(OrderService::class)->ghiNhanThanhToan($don);
 
         if ($conLai !== null) {
@@ -207,11 +207,11 @@ class QuanTriTest extends TestCase
     {
         Mail::fake();
 
-        $don = app(OrderService::class)->taoDon('nopause', 'year', 'khach@example.test');
+        $don = app(OrderService::class)->taoDon('nopause', static::GOI, 'khach@example.test');
 
         $gd = Payment::create([
             'sepay_id' => '555', 'reference_code' => 'SBLAC2',
-            'amount' => 200000, 'content' => 'toi chuyen tien mua phan mem',
+            'amount' => $this->gia(), 'content' => 'toi chuyen tien mua phan mem',
             'note' => 'Khong tim thay ma don trong noi dung chuyen khoan.',
         ]);
 
@@ -227,7 +227,7 @@ class QuanTriTest extends TestCase
     public function test_gan_vao_ma_don_khong_co_thi_bao_loi(): void
     {
         $gd = Payment::create([
-            'sepay_id' => '556', 'amount' => 200000, 'content' => 'x',
+            'sepay_id' => '556', 'amount' => $this->gia(), 'content' => 'x',
         ]);
 
         $this->actingAs($this->admin())
@@ -242,11 +242,11 @@ class QuanTriTest extends TestCase
     {
         Mail::fake();
 
-        $don = app(OrderService::class)->taoDon('nopause', 'year');
-        $donKhac = app(OrderService::class)->taoDon('nopause', 'year');
+        $don = app(OrderService::class)->taoDon('nopause', static::GOI);
+        $donKhac = app(OrderService::class)->taoDon('nopause', static::GOI);
 
         $gd = Payment::create([
-            'sepay_id' => '557', 'amount' => 200000, 'content' => 'x', 'order_id' => $don->id,
+            'sepay_id' => '557', 'amount' => $this->gia(), 'content' => 'x', 'order_id' => $don->id,
         ]);
 
         $this->actingAs($this->admin())

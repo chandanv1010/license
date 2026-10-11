@@ -22,7 +22,7 @@ class EmailVaTraCuuTest extends TestCase
 
     private function don(?string $email = 'khach@example.test'): Order
     {
-        return app(OrderService::class)->taoDon('nopause', 'year', $email);
+        return app(OrderService::class)->taoDon('nopause', static::GOI, $email);
     }
 
     // --- Gui luc cap moi ------------------------------------------------------

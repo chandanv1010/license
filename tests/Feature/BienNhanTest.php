@@ -24,7 +24,7 @@ class BienNhanTest extends TestCase
     {
         Mail::fake();
 
-        $don = app(OrderService::class)->taoDon('nopause', 'year', $email);
+        $don = app(OrderService::class)->taoDon('nopause', static::GOI, $email);
         app(OrderService::class)->ghiNhanThanhToan($don);
 
         return $don->fresh();
@@ -43,7 +43,7 @@ class BienNhanTest extends TestCase
             ->assertOk()
             ->assertSee($don->code)
             ->assertSee('ĐÃ THANH TOÁN')
-            ->assertSee('200.000đ');
+            ->assertSee(number_format($this->gia(), 0, ',', '.') . 'đ');
     }
 
     /**
@@ -69,7 +69,7 @@ class BienNhanTest extends TestCase
     /** Don chua tra thi chua co gi de bien nhan. */
     public function test_don_chua_tra_thi_khong_co_bien_nhan(): void
     {
-        $don = app(OrderService::class)->taoDon('nopause', 'year', 'khach@example.test');
+        $don = app(OrderService::class)->taoDon('nopause', static::GOI, 'khach@example.test');
 
         $this->get($this->duong($don))->assertNotFound();
     }
@@ -101,7 +101,7 @@ class BienNhanTest extends TestCase
         Mail::fake();
 
         $cu = $this->donDaTra()->licenseKetQua();
-        $don = app(OrderService::class)->taoDon('nopause', 'year', null, $cu);
+        $don = app(OrderService::class)->taoDon('nopause', static::GOI, null, $cu);
         app(OrderService::class)->ghiNhanThanhToan($don);
 
         $this->get($this->duong($don->fresh()))
@@ -113,7 +113,7 @@ class BienNhanTest extends TestCase
     {
         Mail::fake();
 
-        $don = app(OrderService::class)->taoDon('nopause', 'year', 'khach@example.test');
+        $don = app(OrderService::class)->taoDon('nopause', static::GOI, 'khach@example.test');
         $license = app(OrderService::class)->ghiNhanThanhToan($don);
 
         $html = (new LicenseMail($license, 'moi', $don->fresh()))->render();

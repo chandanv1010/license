@@ -21,7 +21,7 @@ class LenhDinhKyTest extends TestCase
 
     private function don(?string $email = 'khach@example.test'): Order
     {
-        return app(OrderService::class)->taoDon('nopause', 'year', $email);
+        return app(OrderService::class)->taoDon('nopause', static::GOI, $email);
     }
 
     // --- license:doi-soat -----------------------------------------------------
@@ -31,8 +31,10 @@ class LenhDinhKyTest extends TestCase
      * `transferAmount`, `transaction_content` so voi `content`... Doi sai mot
      * truong la lenh doi soat im lang khong lam gi, ma khong ai biet.
      */
-    private function giaoDichApi(string $noiDung, int $soTien = 200000, array $ghiDe = []): array
+    private function giaoDichApi(string $noiDung, ?int $soTien = null, array $ghiDe = []): array
     {
+        $soTien ??= $this->gia();
+
         return array_merge([
             'id' => 'a520ea96-c528-11f1-b21a-a6006ab65aca',
             'transaction_date' => '2026-10-11 11:02:58',
@@ -88,7 +90,7 @@ class LenhDinhKyTest extends TestCase
         Payment::create([
             'sepay_id' => '92704',
             'reference_code' => 'SBE203F6EF854B',
-            'amount' => 200000,
+            'amount' => $this->gia(),
             'content' => $don->code,
             'order_id' => $don->id,
             'note' => 'Da cap license.',
@@ -106,7 +108,7 @@ class LenhDinhKyTest extends TestCase
     public function test_doi_soat_bo_qua_giao_dich_tien_ra(): void
     {
         $don = $this->don();
-        $this->giaVo([$this->giaoDichApi($don->code, 200000, ['transfer_type' => 'out'])]);
+        $this->giaVo([$this->giaoDichApi($don->code, $this->gia(), ['transfer_type' => 'out'])]);
 
         $this->artisan('license:doi-soat')->assertSuccessful();
 

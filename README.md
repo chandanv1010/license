@@ -26,6 +26,13 @@ Gia hạn đi đúng luồng đó, chỉ khác một chỗ: người mua điền
 mua, và lúc tiền về thì máy chủ **cộng thêm ngày vào chính mã đó** thay vì cấp
 mã mới.
 
+⚠️ Chu kỳ bán là **3 tháng**, và chuyển khoản ngân hàng **không tự động gia hạn
+được** — khách phải tự chuyển tiền lại bốn lần một năm. Mỗi lần là một cơ hội
+để họ bỏ, nên `license:nhac-gia-han` ở đây là thứ giữ doanh thu chứ không phải
+tính năng phụ. Muốn đổi chu kỳ thì sửa `days` và `amount` trong
+`config/license.php`; không chỗ nào khác viết cứng hai con số đó, kể cả bài
+kiểm tra.
+
 ## Chạy ở máy
 
 ```bash
@@ -77,7 +84,7 @@ SEPAY_BANK=MB
 SEPAY_ACCOUNT_NAME="NGUYEN CONG TUAN"
 
 # --- Giá ---
-LICENSE_NOPAUSE_YEAR=200000
+LICENSE_NOPAUSE_QUY=50000
 LICENSE_CODE_PREFIX=LX
 LICENSE_MAX_DEVICES=3
 LICENSE_DEVICE_IDLE_DAYS=14      # máy lâu không dùng thì nhả suất; 0 = tắt
@@ -117,7 +124,7 @@ chuyển tiền mà không nhận được mã thì họ nghĩ mình lừa đả
 ## Vòng đời một mã kích hoạt
 
 ```
-tiền về → sinh key NOPAUSE-XXXX-XXXX-XXXX, hạn 365 ngày, tối đa 3 máy
+tiền về → sinh key NOPAUSE-XXXX-XXXX-XXXX, hạn 90 ngày, tối đa 3 máy
    → gửi về email người mua
    → dán vào extension, extension gọi /api/license/verify kèm id máy
    → máy chưa có trong danh sách thì chiếm một suất

@@ -19,15 +19,20 @@ return [
     |
     | `days` la so ngay license con hieu luc ke tu luc thanh toan.
     |
+    | Chu y khi doi chu ky ban: chuyen khoan ngan hang KHONG tu dong gia han
+    | duoc. Chu ky cang ngan thi khach cang phai tu chuyen tien nhieu lan mot
+    | nam, va moi lan la mot co hoi de ho bo. Lenh `license:nhac-gia-han` vi
+    | the la thu giu doanh thu, khong phai tinh nang phu.
+    |
     */
     'products' => [
         'nopause' => [
             'name' => 'NoPause Playback',
             'plans' => [
-                'year' => [
-                    'label' => 'Gói 1 năm',
-                    'amount' => (int) env('LICENSE_NOPAUSE_YEAR', 200000),
-                    'days' => 365,
+                'quy' => [
+                    'label' => 'Gói 3 tháng',
+                    'amount' => (int) env('LICENSE_NOPAUSE_QUY', 50000),
+                    'days' => 90,
                 ],
             ],
         ],

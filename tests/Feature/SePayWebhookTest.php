@@ -33,9 +33,9 @@ class SePayWebhookTest extends TestCase
         config()->set('license.sepay.allowed_ips', []);
     }
 
-    private function don(int $soTien = 200000): Order
+    private function don(): Order
     {
-        return app(OrderService::class)->taoDon('nopause', 'year', 'khach@example.test');
+        return app(OrderService::class)->taoDon('nopause', static::GOI, 'khach@example.test');
     }
 
     private function goiTin(array $ghiDe = []): array
@@ -48,7 +48,7 @@ class SePayWebhookTest extends TestCase
             'code' => null,
             'content' => 'chuyen tien',
             'transferType' => 'in',
-            'transferAmount' => 200000,
+            'transferAmount' => $this->gia(),
             'referenceCode' => 'MBVCB.16475489034',
         ], $ghiDe);
     }
@@ -179,7 +179,7 @@ class SePayWebhookTest extends TestCase
 
         $this->gui($this->goiTin([
             'content' => $don->code,
-            'transferAmount' => 150000,
+            'transferAmount' => $this->gia() - 1000,
         ]))->assertOk();
 
         $this->assertSame(Order::CHUA_TRA, $don->fresh()->status);
@@ -233,7 +233,7 @@ class SePayWebhookTest extends TestCase
 
     // --- Noi dung license cap ra ----------------------------------------------
 
-    public function test_license_co_han_dung_365_ngay_va_gan_voi_don(): void
+    public function test_license_co_han_dung_bang_so_ngay_cua_goi_va_gan_voi_don(): void
     {
         $don = $this->don();
 
@@ -244,7 +244,7 @@ class SePayWebhookTest extends TestCase
         $this->assertSame($don->id, $license->order_id);
         $this->assertSame('nopause', $license->product);
         $this->assertSame('khach@example.test', $license->email);
-        $this->assertSame(365, (int) round($license->starts_at->diffInDays($license->expires_at)));
+        $this->assertSame($this->soNgay(), (int) round($license->starts_at->diffInDays($license->expires_at)));
         $this->assertStringStartsWith('NOPAUSE-', $license->key);
     }
 
@@ -262,7 +262,7 @@ class SePayWebhookTest extends TestCase
 
         $this->assertSame('92704', $thanhToan->sepay_id);
         $this->assertSame('MBBank', $thanhToan->gateway);
-        $this->assertSame(200000, $thanhToan->amount);
+        $this->assertSame($this->gia(), $thanhToan->amount);
         $this->assertSame('MBVCB.16475489034', $thanhToan->raw['referenceCode']);
     }
 }

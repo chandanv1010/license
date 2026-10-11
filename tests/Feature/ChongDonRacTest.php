@@ -34,7 +34,7 @@ class ChongDonRacTest extends TestCase
 
     private function dat(array $ghiDe = []): array
     {
-        return array_merge(['product' => 'nopause', 'plan' => 'year'], $ghiDe);
+        return array_merge(['product' => 'nopause', 'plan' => static::GOI], $ghiDe);
     }
 
     // --- Lop 1: dung lai don cu trong phien -----------------------------------
@@ -172,16 +172,16 @@ class ChongDonRacTest extends TestCase
      */
     public function test_khong_xoa_don_da_co_giao_dich_du_chua_tra(): void
     {
-        $don = app(OrderService::class)->taoDon('nopause', 'year', 'khach@example.test');
+        $don = app(OrderService::class)->taoDon('nopause', static::GOI, 'khach@example.test');
         $don->forceFill(['created_at' => now()->subHours(5)])->save();
 
         Payment::create([
             'sepay_id' => '12345',
             'reference_code' => 'SBTHIEUTIEN',
-            'amount' => 150000,
+            'amount' => $this->gia() - 1000,
             'content' => $don->code,
             'order_id' => $don->id,
-            'note' => 'Chuyen thieu: nhan 150000d, can 200000d.',
+            'note' => 'Chuyen thieu: chua du tien.',
         ]);
 
         $this->artisan('license:don-don')->assertSuccessful();
@@ -191,7 +191,7 @@ class ChongDonRacTest extends TestCase
 
     public function test_van_xoa_don_qua_han_khong_co_giao_dich(): void
     {
-        $don = app(OrderService::class)->taoDon('nopause', 'year');
+        $don = app(OrderService::class)->taoDon('nopause', static::GOI);
         $don->forceFill(['created_at' => now()->subHours(5)])->save();
 
         $this->artisan('license:don-don')->assertSuccessful();

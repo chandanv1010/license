@@ -22,7 +22,7 @@ class LicenseVerifyTest extends TestCase
 
     private function license(array $ghiDe = []): License
     {
-        $don = app(OrderService::class)->taoDon('nopause', 'year');
+        $don = app(OrderService::class)->taoDon('nopause', static::GOI);
         $license = app(OrderService::class)->ghiNhanThanhToan($don);
 
         if ($ghiDe) {

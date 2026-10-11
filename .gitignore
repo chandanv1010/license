@@ -28,7 +28,8 @@ Thumbs.db
 .phpunit.result.cache
 
 # CSDL SQLite: co email khach va ma kich hoat - khong bao gio len git.
-/database/*.sqlite
+# Khong neo vao /database/: ban sao chep ra cho gi khac van phai bi chan.
+*.sqlite
 /database/*.sqlite-journal
 /database/*.sqlite-shm
 /database/*.sqlite-wal

@@ -39,11 +39,13 @@ class SePayHmacTest extends TestCase
 
     private function don(): Order
     {
-        return app(OrderService::class)->taoDon('nopause', 'year');
+        return app(OrderService::class)->taoDon('nopause', static::GOI);
     }
 
-    private function goiTin(string $noiDung, int $soTien = 200000): array
+    private function goiTin(string $noiDung, ?int $soTien = null): array
     {
+        $soTien ??= $this->gia();
+
         return [
             'id' => 551234,
             'gateway' => 'MBBank',
@@ -143,7 +145,7 @@ class SePayHmacTest extends TestCase
         $moc = (string) time();
         $chuKy = 'sha256=' . hash_hmac('sha256', $moc . '.' . $than, self::SECRET);
 
-        // Ky tren goi tin 200.000d, nhung gui di goi tin 1.000.000d.
+        // Ky tren goi tin dung gia, nhung gui di goi tin 1.000.000d.
         $goiTin['transferAmount'] = 1000000;
         $thanGia = json_encode($goiTin, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 

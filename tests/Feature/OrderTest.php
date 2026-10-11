@@ -18,18 +18,18 @@ class OrderTest extends TestCase
 
         $tra = $this->postJson('/api/order', [
             'product' => 'nopause',
-            'plan' => 'year',
+            'plan' => static::GOI,
         ])->assertOk();
 
         $ma = $tra->json('code');
         $qr = $tra->json('qr');
 
-        $this->assertSame(200000, $tra->json('amount'));
+        $this->assertSame($this->gia(), $tra->json('amount'));
 
         // Dien san so tien va noi dung la bat buoc: bat nguoi mua tu go ma vao
         // o noi dung thi chac chan co nguoi go sai, va moi lan go sai la mot
         // lan phai doi chieu bang tay.
-        $this->assertStringContainsString('amount=200000', $qr);
+        $this->assertStringContainsString('amount=' . $this->gia(), $qr);
         $this->assertStringContainsString('des=' . $ma, $qr);
         $this->assertStringContainsString('acc=0281119899999', $qr);
     }
@@ -40,7 +40,7 @@ class OrderTest extends TestCase
         $ma = [];
 
         for ($i = 0; $i < 50; $i++) {
-            $ma[] = $dichVu->taoDon('nopause', 'year')->code;
+            $ma[] = $dichVu->taoDon('nopause', static::GOI)->code;
         }
 
         $this->assertCount(50, array_unique($ma), 'Co ma don bi trung');
@@ -52,7 +52,7 @@ class OrderTest extends TestCase
 
     public function test_san_pham_hoac_goi_khong_co_thi_404(): void
     {
-        $this->postJson('/api/order', ['product' => 'khong-co', 'plan' => 'year'])->assertNotFound();
+        $this->postJson('/api/order', ['product' => 'khong-co', 'plan' => static::GOI])->assertNotFound();
         $this->postJson('/api/order', ['product' => 'nopause', 'plan' => 'thang'])->assertNotFound();
     }
 
@@ -64,7 +64,7 @@ class OrderTest extends TestCase
      */
     public function test_don_chua_tra_thi_khong_lo_key(): void
     {
-        $don = app(OrderService::class)->taoDon('nopause', 'year');
+        $don = app(OrderService::class)->taoDon('nopause', static::GOI);
 
         $this->getJson("/api/order/{$don->code}/status")
             ->assertOk()
@@ -74,7 +74,7 @@ class OrderTest extends TestCase
 
     public function test_don_da_tra_thi_tra_ve_key(): void
     {
-        $don = app(OrderService::class)->taoDon('nopause', 'year');
+        $don = app(OrderService::class)->taoDon('nopause', static::GOI);
         $license = app(OrderService::class)->ghiNhanThanhToan($don);
 
         $this->getJson("/api/order/{$don->code}/status")
@@ -91,7 +91,7 @@ class OrderTest extends TestCase
     public function test_ghi_nhan_thanh_toan_hai_lan_chi_mot_license(): void
     {
         $dichVu = app(OrderService::class);
-        $don = $dichVu->taoDon('nopause', 'year');
+        $don = $dichVu->taoDon('nopause', static::GOI);
 
         $mot = $dichVu->ghiNhanThanhToan($don);
         $hai = $dichVu->ghiNhanThanhToan($don->fresh());
@@ -105,7 +105,7 @@ class OrderTest extends TestCase
         $this->get('/mua/nopause')
             ->assertOk()
             ->assertSee('NoPause Playback')
-            ->assertSee('200.000đ');
+            ->assertSee(number_format($this->gia(), 0, ',', '.') . 'đ');
     }
 
     public function test_trang_mua_san_pham_la_thi_404(): void
